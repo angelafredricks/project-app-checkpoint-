@@ -1,6 +1,8 @@
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
+const taskInput = document.getElementById("taskInput");
+const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -13,21 +15,26 @@ function renderTasks() {
     const li = document.createElement("li");
     li.className = task.completed ? "completed" : "";
 
-    li.innerHTML = `
-      <span onclick="toggleTask(${index})">${task.text}</span>
-      <button onclick="deleteTask(${index})">❌</button>
-    `;
+    const span = document.createElement("span");
+    span.textContent = task.text;
+    span.addEventListener("click", () => toggleTask(index));
 
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "❌";
+    deleteBtn.addEventListener("click", () => deleteTask(index));
+
+    li.appendChild(span);
+    li.appendChild(deleteBtn);
     taskList.appendChild(li);
   });
 }
 
 function addTask() {
-  const input = document.getElementById("taskInput");
-  if (input.value.trim() === "") return;
+  const text = taskInput.value.trim();
+  if (text === "") return;
 
-  tasks.push({ text: input.value, completed: false });
-  input.value = "";
+  tasks.push({ text: text, completed: false });
+  taskInput.value = "";
 
   saveTasks();
   renderTasks();
@@ -45,4 +52,15 @@ function deleteTask(index) {
   renderTasks();
 }
 
+// BUTTON EVENT LISTENER (instead of inline onclick)
+addBtn.addEventListener("click", addTask);
+
+// Optional: Press Enter to add task
+taskInput.addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    addTask();
+  }
+});
+
+// Initial render
 renderTasks();
